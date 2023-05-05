@@ -11,3 +11,6 @@ The final product should aid the user to:
 -filter books by author.
 -filter books by genre.
 -toggle between dark and light modes.
+
+
+Link to slideshow/presentation: https://docs.google.com/presentation/d/1D19JxDypQZ_qz_m047Rxq91Dt54OJ8xYSOaqpz-KK-g/edit?usp=sharing
