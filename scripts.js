@@ -241,86 +241,7 @@ const createPreviewsFragment = (matches, startIndex, endIndex) => {
    return fragment
 }
 
-
-
-
-
-const createPreviewsFragment = (matches, startIndex, endIndex) => {
-  const fragment = document.createDocumentFragment();
-   
-  for (let i = startIndex; i < endIndex && i < matches.length; i++) {
-    const match = matches[i];
-    const preview = document.createElement('div')
-    preview.classList = 'preview';
-    preview.innerHTML = /* html */ `
-    <img
-        class="preview__image"
-        src="${match.image}"
-    />
-    
-    <div class="preview__info">
-        <h3 class="preview__title">${match.title}</h3>
-        <div class="preview__author">${authors[match.author]}</div>
-    </div>
-`
-
-    fragment.appendChild(preview) 
-
-  }
- 
-   return fragment
-}
-
-for (let i = 0; i < extracted.length; i++) {
-    const preview = createPreview(
-        extracted[i].author,
-        extracted[i].id,
-        extracted[i].image,
-        extracted[i].title
-)
-
-    fragment.appendChild(preview)
-}
-
-dataListItems.appendChild(fragment)
-
-const genresFragment = document.createDocumentFragment()
-
-for (const [id, name] of Object.entries(genres)) {
-    const element = document.createElement('option')
-    element.textText = "All Genres"
-    element.value = id
-    element.innerHTML = name
-    
-    genresFragment.appendChild(element)
-}
-
-dataSearchGenres.appendChild(genresFragment)
-
-const authorsFragment = document.createDocumentFragment()
-
-for (const [id, name] of Object.entries(authors)) {
-    const element = document.createElement('option')
-    element.value = id
-    element.innerText = name
-    authorsFragment.appendChild(element)
-}
-
-dataSearchAuthors.appendChild(authorsFragment);
-
-const dataSettingsTheme = document.querySelector('[data-settings-theme]');
-// assigns either "night" or "day" depending on user's preference
-const themePreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
-dataSettingsTheme.value = themePreference;
-
-// sets the page's root element based on the value of themePreference variable
-document.documentElement.style.setProperty('--color-dark', css[themePreference].dark);
-document.documentElement.style.setProperty('--color-light', css[themePreference].light);
-
 const dataListButton = document.querySelector('[data-list-button]');
-const dataSearchCancel = document.querySelector('[data-search-cancel]');
-const dataSettingsCancel = document.querySelector('[data-settings-cancel]');
-const dataSettingsForm = document.querySelector('[data-settings-form]');
 const dataListClose = document.querySelector('[data-list-close]');
 const dataListActive = document.querySelector('[data-list-active]');
 
@@ -328,13 +249,6 @@ dataListButton.innerHTML = /* html */
     `<span>Show more</span>
     <span class="list__remaining"> (${matches.length - [page * BOOKS_PER_PAGE] > 0 ? (matches.length - [page * BOOKS_PER_PAGE]) : 0})</span>`; 
 dataListButton.disabled = (!(matches.length - [page * BOOKS_PER_PAGE] > 0)); //if no more books to show disable button
-
-const dataSearchOverlay = document.querySelector('[data-search-overlay]');
-const dataSettingsOverlay = document.querySelector('[data-settings-overlay]');
-
-dataSearchCancel.addEventListener("click", () => { dataSearchOverlay.open = false });
-dataSettingsCancel.addEventListener("click", () => { dataSettingsOverlay.open = false });
-dataSettingsForm.addEventListener("submit", (e) => { e.preventDefault; const formData = new FormData(e.target)}) ;// change the inside to something that will submit the form 
 dataListClose.addEventListener("click", ()=>  { dataListActive.open = false });
 
 dataListButton.addEventListener("click", () => {
@@ -346,118 +260,9 @@ dataListButton.addEventListener("click", () => {
     
     dataListButton.disabled = !(matches.length > (page + 1) * BOOKS_PER_PAGE);
 
-})
+});
 
-const dataHeaderSearch = document.querySelector('[data-header-search]');
-const dataHeaderSettings = document.querySelector('[data-header-settings]');
-const dataSearchTitle = document.querySelector('[data-search-title]');
-const dataSearchForm = document.querySelector('[data-search-form]')
 const dataListMessage = document.querySelector('[data-list-message]')
-
-dataHeaderSettings.addEventListener('click', ()=> {
-    dataSettingsOverlay.open = true;
-    // dataSettingsTitle.focus();
-});
-
-dataHeaderSearch.addEventListener('click', ()=> {
-    dataSearchOverlay.open = true;
-    dataSearchTitle.focus();
-});
-
-dataSearchForm.addEventListener('submit', (e) => {
-    e.preventDefault()
-    const formData = new FormData(e.target)
-    const filters = Object.fromEntries(formData)
-    let result = []
-
-    for (const book of matches) {
-        const titleMatch = filters.title.trim() === '' && book.title.toLowerCase().includes(filters.title.toLowerCase())
-
-        let authorMatch = filters.author === 'any' || book.author === filters.author
-        for (const author of book.author) { 
-
-            if (author === filters.author) { 
-                authorMatch = true;
-                break; 
-            }
-        }
-
-            let genreMatch = filters.genre === 'any' || book.genres === filters.genres
-            for (const genre of book.genres) { 
-
-                if (genre === filters.genre) { 
-                    genreMatch = true;
-                    break; 
-                }
-            }
-        
-
-        if (titleMatch && authorMatch && genreMatch ) { 
-            result.push(book)
-        }
-    }
-
-    if (result.length < 1) {
-        dataListMessage.classList.add('list__message_show')
-    }
-    else {
-        dataListMessage.classList.remove('list__message_show')
-    }
-
-    dataListItems.innerHTML = ''
-    const fragment = document.createDocumentFragment()
-    const extracted = result.slice(0, BOOKS_PER_PAGE)
-
-    for (const book of extracted) {
-        const { author: authorId, id, image, title } = book
-
-        const element = document.createElement('button')
-        element.classList = 'preview'
-        element.setAttribute('data-preview', id)
-
-        element.innerHTML = /* html */ `
-            <img
-                class="preview__image"
-                src="${image}"
-            />
-            
-            <div class="preview__info">
-                <h3 class="preview__title">${title}</h3>
-                <div class="preview__author">${authors[authorId]}</div>
-            </div>
-        `
-
-        fragment.appendChild(element)
-    }
-    
-    dataListItems.appendChild(fragment)
-
-    
-})
-
-        // const initial = matches.length - (page * BOOKS_PER_PAGE)
-        // const remaining = hasRemaining ? initial : 0
-        // dataListButton.disabled = initial > 0 ? true : false
-
-        // dataListButton.innerHTML = /* html */ `
-        //                          <span>Show more</span>
-        //                          <span class="list__remaining"> (${remaining})</span>
-        //                         `
-
-        //     window.scrollTo({ top: 0, behavior: 'smooth' });
-        //     dataSearchOverlay.open = false
-    
-  
-dataSettingsOverlay.addEventListener('submit', (e) => {   
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const result = Object.fromEntries(formData);
-      document.documentElement.style.setProperty('--color-dark', css[result.theme].dark);
-      document.documentElement.style.setProperty('--color-light', css[result.theme].light);
-      dataSettingsOverlay.open = false;
- });
-        
-
 const dataListBlur = document.querySelector('[data-list-blur]');
 let dataListTitle = document.querySelector('[data-list-title]');
 const dataListSubtitle = document.querySelector('[data-list-subtitle]');
@@ -472,7 +277,7 @@ dataListItems.addEventListener('click', (event) => {
        
         const previewId = node?.dataset?.preview;
 
-        for (const singleBook of books) {
+        for (const singleBook of matches) {
             if (singleBook.id === previewId) {
                 active = singleBook;
                 break;
@@ -482,16 +287,13 @@ dataListItems.addEventListener('click', (event) => {
         if (active) {
         
             dataListActive.open = true,
-            dataListBlur.dataListImage = active.image;
+            dataListImage.src = active.image;
             dataListTitle.innerHTML = active.title,
             dataListSubtitle.innerHTML = `${authors[active.author]} (${new Date(active.published).getFullYear()})`
             dataListDescription.innerHTML = `${active.description}`
             break;
         } 
-        
-        // if (active) {
-        //     return;
-        // }
+   
     }
     
 });
