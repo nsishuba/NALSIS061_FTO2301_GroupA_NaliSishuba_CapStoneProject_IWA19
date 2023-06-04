@@ -46,26 +46,63 @@ dataSettingsTheme.value = themePreference;
 document.documentElement.style.setProperty('--color-dark', css[themePreference].dark);
 document.documentElement.style.setProperty('--color-light', css[themePreference].light);
 
-const createPreview = (author, id, image, title) => {
-   
-    const preview = document.createElement('button')
-    preview.classList = 'preview'
-    preview.setAttribute('data-preview', id)
- 
-    preview.innerHTML = /* html */ `
-        <img
-            class="preview__image"
-            src="${image}"
-        />
-        
-        <div class="preview__info">
-            <h3 class="preview__title">${title}</h3>
-            <div class="preview__author">${authors[author]}</div>
-        </div>
-    `
+const dataListItems = document.querySelector('[data-list-items]')
+const dataSearchOverlay = document.querySelector('[data-search-overlay]');
+const dataSearchForm = document.querySelector('[data-search-form]')
+const dataSearchTitle = document.querySelector('[data-search-title]');
+const dataSearchGenres = document.querySelector('[data-search-genres]');
+const dataSearchAuthors = document.querySelector('[data-search-authors]');
+const dataSearchCancel = document.querySelector('[data-search-cancel]');
+const dataHeaderSearch = document.querySelector('[data-header-search]');
+const dataHeaderSettings = document.querySelector('[data-header-settings]');
+
+const genresFragment = document.createDocumentFragment();
+
+const genreElement = document.createElement('option')
+genreElement.value = 'any'
+genreElement.innerText = 'All Genres'
+genresFragment.appendChild(genreElement)
+
+for (const [id, name] of Object.entries(genres)) {
+    const element = document.createElement('option');
+    element.value = id;
+    element.innerHTML = name;
     
-    return preview
+    genresFragment.appendChild(element);
 }
+
+dataSearchGenres.appendChild(genresFragment); //appending to select HTML tag
+
+const authorsFragment = document.createDocumentFragment();
+
+const authorElement = document.createElement('option')
+authorElement.value = 'any'
+authorElement.innerText = 'All Authors'
+authorsFragment.appendChild(authorElement)
+
+for (const [id, name] of Object.entries(authors)) {
+    const element = document.createElement('option');
+    element.value = id;
+    element.innerText = name;
+    authorsFragment.appendChild(element);
+}
+
+dataSearchAuthors.appendChild(authorsFragment);
+
+dataSearchCancel.addEventListener("click", () => { dataSearchOverlay.open = false });
+dataHeaderSettings.addEventListener('click', ()=> {
+    dataSettingsOverlay.open = true;
+});
+dataHeaderSearch.addEventListener('click', ()=> {
+    dataSearchOverlay.open = true;
+    dataSearchTitle.focus();
+});
+dataSearchForm.addEventListener("submit", (e) => {
+    e.preventDefault()//prevents the page from reloading when form is submited
+    const formData = new FormData(e.target)
+    const filters = Object.fromEntries(formData)//creates object with key-value pairs from the form data
+    let result = []
+    
 const createPreviewsFragment = (matches, startIndex, endIndex) => {
   const fragment = document.createDocumentFragment();
    
