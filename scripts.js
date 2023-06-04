@@ -102,7 +102,149 @@ dataSearchForm.addEventListener("submit", (e) => {
     const formData = new FormData(e.target)
     const filters = Object.fromEntries(formData)//creates object with key-value pairs from the form data
     let result = []
+
+    for (const book of matches) {
+        const titleMatch = filters.title.trim() === '' && book.title.toLowerCase().includes(filters.title.toLowerCase())
+
+        let authorMatch = filters.author === 'any' || book.author === filters.author
+        for (const author of book.author) { 
+
+            if (author === filters.author) { 
+                authorMatch = true;
+                break; 
+            }
+        }
+
+            let genreMatch = filters.genre === 'any' || book.genres === filters.genres
+            for (const genre of book.genres) { 
+
+                if (genre === filters.genre) { 
+                    genreMatch = true;
+                    break; 
+                }
+            }
+        
+
+        if (titleMatch && authorMatch && genreMatch ) { 
+            result.push(book);
+        }
+    }
+
+    if (result.length < 1) {
+        dataListMessage.classList.add('list__message_show');
+    }
+    else {
+        dataListMessage.classList.remove('list__message_show');
+    }
+
+    dataListItems.innerHTML = ''; 
+    const fragment = document.createDocumentFragment();
+    const extracted = result.slice(0, BOOKS_PER_PAGE); // variable 'extracted' extracts the first 36 array elements from matches object
+
+    for (const book of extracted) {
+        const { author: authorId, id, image, title } = book;
+
+        const element = document.createElement('button');
+        element.classList = 'preview';
+        element.setAttribute('data-preview', id);
+
+        element.innerHTML = /* html */ `
+            <img
+                class="preview__image"
+                src="${image}"
+            />
+            
+            <div class="preview__info">
+                <h3 class="preview__title">${title}</h3>
+                <div class="preview__author">${authors[authorId]}</div>
+            </div>
+        `
+
+        fragment.appendChild(element);
+    }
+
+    dataListItems.appendChild(fragment);
+    const initial = matches.length - [page * BOOKS_PER_PAGE]
+    const hasRemaining = 0; //? 
+    const remaining = hasRemaining ? initial : 0
+    dataListButton.disabled = initial > 0
+
+    dataListButton.innerHTML = /* html */ `
+        <span>Show more</span>
+        <span class="list__remaining"> (${remaining})</span>
+    `
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    dataSearchOverlay.open = false;
     
+});
+
+const createPreview = (author, id, image, title) => {
+   
+    const preview = document.createElement('button')
+    preview.classList = 'preview'
+    preview.setAttribute('data-preview', id)
+ 
+    preview.innerHTML = /* html */ `
+        <img
+            class="preview__image"
+            src="${image}"
+        />
+        
+        <div class="preview__info">
+            <h3 class="preview__title">${title}</h3>
+            <div class="preview__author">${authors[author]}</div>
+        </div>
+    `
+    
+    return preview
+}
+
+const fragment = document.createDocumentFragment()
+
+for (let i = 0; i < extracted.length; i++) {
+    const preview = createPreview(
+        extracted[i].author,
+        extracted[i].id,
+        extracted[i].image,
+        extracted[i].title
+)
+
+    fragment.appendChild(preview)
+}
+
+dataListItems.appendChild(fragment)
+
+const createPreviewsFragment = (matches, startIndex, endIndex) => {
+  const fragment = document.createDocumentFragment();
+   
+  for (let i = startIndex; i < endIndex && i < matches.length; i++) {
+    const match = matches[i];
+    const preview = document.createElement('div')
+    preview.classList = 'preview';
+    preview.innerHTML = /* html */ `
+    <img
+        class="preview__image"
+        src="${match.image}"
+    />
+    
+    <div class="preview__info">
+        <h3 class="preview__title">${match.title}</h3>
+        <div class="preview__author">${authors[match.author]}</div>
+    </div>
+`
+
+    fragment.appendChild(preview) 
+
+  }
+ 
+   return fragment
+}
+
+
+
+
+
 const createPreviewsFragment = (matches, startIndex, endIndex) => {
   const fragment = document.createDocumentFragment();
    
