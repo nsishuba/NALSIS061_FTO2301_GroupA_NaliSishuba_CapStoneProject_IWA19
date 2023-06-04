@@ -1,9 +1,13 @@
-import { BOOKS_PER_PAGE, authors, genres, books } from "./data.js" 
-const matches = [...books] //cloning books object
-const [{ id, genres: genre, popularity, title, image, description, pages, published, author}] = matches //destructuring
+import { BOOKS_PER_PAGE, 
+    authors, 
+    genres, 
+    books } 
+    from "./data.js" ;
+const matches = [...books];//cloning books object
 let page = 1;
+const extracted = matches.slice(0, 36) ;
 
-if (!books && !Array.isArray(books)) throw new Error('Source required') 
+if (!books && !Array.isArray(books)) throw new Error('Source required') ;
 // if (!range && range.length < 2) throw new Error('Range must be an array with two numbers')  //what is range referring to?
 
 const css = {
@@ -16,14 +20,31 @@ const css = {
     dark: '255, 255, 255',
     light: '10, 10, 20',
 }
-}
+};
 
-const dataListItems = document.querySelector('[data-list-items]')
-const dataSearchGenres = document.querySelector('[data-search-genres]')
-const dataSearchAuthors = document.querySelector('[data-search-authors]')
+const dataSettingsOverlay = document.querySelector('[data-settings-overlay]');
+const dataSettingsForm = document.querySelector('[data-settings-form]');
+const dataSettingsTheme = document.querySelector('[data-settings-theme]');
+const dataSettingsCancel = document.querySelector('[data-settings-cancel]');
 
-const fragment = document.createDocumentFragment()
-const extracted = matches.slice(0, 36) // variable 'extracted' extracts the first 36 array elements from matches object
+dataSettingsCancel.addEventListener("click", () => { dataSettingsOverlay.open = false });
+
+//Changes the colour scheme of the page when the user selects a theme.
+dataSettingsForm.addEventListener('submit', (e) => {   
+      e.preventDefault(); // Allows the form to be submitted without a page refresh.
+      const formData = new FormData(e.target);
+      const result = Object.fromEntries(formData);
+      document.documentElement.style.setProperty('--color-dark', css[result.theme].dark);
+      document.documentElement.style.setProperty('--color-light', css[result.theme].light);
+      dataSettingsOverlay.open = false;
+ });
+
+/* Sets the initial colour scheme of the page based on users device preference. 
+   Checks if the css media query matches the current state of the window.*/ 
+const themePreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
+dataSettingsTheme.value = themePreference;
+document.documentElement.style.setProperty('--color-dark', css[themePreference].dark);
+document.documentElement.style.setProperty('--color-light', css[themePreference].light);
 
 const createPreview = (author, id, image, title) => {
    
