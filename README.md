@@ -1,4 +1,4 @@
-Book Connect Website
+# Book Connect Website
 
 The goal of the project was to "fix all critical issues, as well as do a full audit of the existing code... highlight areas where improvements can be made to performance, readability and future maintainability."
 
